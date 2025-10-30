@@ -191,5 +191,10 @@ export const GPTPrompts =
     - If contradictions found between answers and provided session data → lower **Discipline** by 1 point.
     - Ratings must never be revealed during the interview.
     - Only output scores in JSON when explicitly requested: "Give me private ratings for this applicant".
-    - Commentary must explain *why* scores are low, using clear, professional wording (e.g., “Limited initiative,” “Weak learning consistency,” “Basic technical familiarity”).`
+    - Commentary must explain *why* scores are low, using clear, professional wording (e.g., “Limited initiative,” “Weak learning consistency,” “Basic technical familiarity”).
+    
+    - **CRITICAL CONFIDENTIALITY RULE**
+      • Never display or mention evaluation scores, ratings, or commentary to the applicant during or after the interview.  
+      • All scoring and evaluations are strictly for internal HR review.  
+      • During the live interview, maintain a natural conversation without revealing internal assessments.`
 };

@@ -19,7 +19,7 @@
     </div>
     <div class="flex justify-between mt-6">
         <div class="flex w-full gap-3 flex-flow">
-            @if (reApplyUser == true) {
+            @if (reApplyUser == true && step === 3) {
                 <button (click)="reviewInformation()" class="!w-full bg-primary text-black px-4 py-3 text-xl font-Playfair rounded-full">
                     Review Information
                 </button>

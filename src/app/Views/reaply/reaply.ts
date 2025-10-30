@@ -295,12 +295,14 @@ export class Reaply implements OnInit {
     this.formService.updateEducation(this.EducationID! , this.EducationalField).subscribe(() => {
       this.EducationModal = false;
       this.displayEducation();
+      this.cdr.detectChanges();
     });
   }
   updateStatusApplication(){
     this.formService.updateStatus(this.StatusID! , this.ApplicationStatusField).subscribe(() => {
       this.StatusModal = false;
       this.displayApplicationStatus();
+      this.cdr.detectChanges();
     });
   }
   modifyMarriage(){
@@ -356,7 +358,9 @@ export class Reaply implements OnInit {
   
   UpdateFormExperience(){
     this.formService.updateWorkExperience(this.workingID!, this.WorkingInformation).subscribe(() => {
-
+      this.modifyWorkExperience = false;
+      this.displayWorkExperience();
+      this.cdr.detectChanges();
     });
   }
   async updatePotfolio() {
@@ -369,6 +373,7 @@ export class Reaply implements OnInit {
       next: () => {
         this.PortfolioModal = false;
         this.displayApplicationStatus();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Portfolio update failed:', err);
@@ -430,6 +435,7 @@ export class Reaply implements OnInit {
     this.formService.storeExperience(this.WorkingInformation).subscribe(() => {
       this.WorkModal = false;
       this.displayWorkExperience();
+      this.cdr.detectChanges();
     });
   }
   openTechnicalSkills(){
