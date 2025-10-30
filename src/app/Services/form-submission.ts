@@ -12,6 +12,7 @@ import { Wpm } from '../Model/wpm/wpm';
 import { IqModel } from '../Model/iq/iq';
 import { Conversation } from '../Model/Conversation/conversation';
 import { Lookup } from '../Model/Lookup/lookup.model';
+import { PortfolioModel } from '../Model/Information/Porfolio/portfolio.model';
 
 @Injectable({
   providedIn: 'root'
@@ -135,7 +136,13 @@ export class FormSubmission {
   updateEducation(id: number, data: Education): Observable<Education> {
     return this.http.put(`${this.apiUrl}applicantEducation/update/${id}`, data);
   }
-   updateStatus(id: number, data: ApplicationStatus): Observable<ApplicationStatus> {
+  updateStatus(id: number, data: ApplicationStatus): Observable<ApplicationStatus> {
     return this.http.put(`${this.apiUrl}applicantionStatus/update/${id}`, data);
+  }
+  updatePorfolio(id: number, data: PortfolioModel): Observable<PortfolioModel> {
+    return this.http.put(`${this.apiUrl}applicantionStatus/updateportfolio/${id}`, data);
+  }
+  updateMarriage(id: number, data: Marriage): Observable<Marriage> {
+    return this.http.put(`${this.apiUrl}applicantMarriage/update/${id}`, data);
   }
 }

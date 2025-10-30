@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormSubmission } from '../../Services/form-submission';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { InformationModel } from '../../Model/Information/information.model';
 import { Education } from '../../Model/Information/Education/education.model';
 import { ApplicationStatus } from '../../Model/Information/ApplicationStatus/application-status.model';
@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { LucideAngularModule , SquarePen , CircleFadingPlus, CircleX , PlusCircle } from 'lucide-angular';
+import { PortfolioModel } from '../../Model/Information/Porfolio/portfolio.model';
 
 @Component({
   selector: 'app-reaply',
@@ -42,10 +43,13 @@ export class Reaply implements OnInit {
   EligibilityModal: boolean = false;
   TechnocalSkillsVisible: boolean = false;
   WorkModal: boolean = false;
+  MarriageModal: boolean = false;
   EducationModal: boolean = false;
   StatusModal: boolean = false;
+  PortfolioModal: boolean = false;
   modifyWorkExperience: boolean = false;
   eligibilityID: number | null = null;
+  marriageID: number | null = null;
   workingID: number | null = null;
   EducationID: number | null = null;
   StatusID: number | null = null;
@@ -60,6 +64,11 @@ export class Reaply implements OnInit {
     reasonforleaving: '',
     position: '',
     contribution: '',
+  }
+  portfolioFields: PortfolioModel = {
+    potfolio_link: '',
+    filename: '',
+    file_content: '',
   }
   eligibilityOptions = {
     cs: false,
@@ -90,9 +99,19 @@ export class Reaply implements OnInit {
     filename: '',
     file_content: '',
   }
+  MarriageField: Marriage = {
+    partnerReligion: '',
+    dateMarried: '',
+    child: '',
+    numberofchildren: null,
+    ageofchildren: '' ,
+    guardianofchildren: '',
+  };
   work?: WorkExperience[] = [];
   eligibilityList: Eligibility = {};
   educationList: Education = {};
+  MarriageList: Marriage = {};
+  applicationStatusList: ApplicationStatus = {};
   selectedFile: File | null = null;
   technicalOptionKeys: string[] = [];
   otherSkillText: string = '';
@@ -118,7 +137,7 @@ export class Reaply implements OnInit {
     'Other': false
   };
 
-  constructor(private formService: FormSubmission, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
+  constructor(private router: Router, private formService: FormSubmission, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.applicantID =  Number(this.route.snapshot.paramMap.get('id')) || 0
@@ -126,6 +145,8 @@ export class Reaply implements OnInit {
     this.displayWorkExperience();
     this.displayEligibility();
     this.displayEducation();
+    this.displayApplicationStatus();
+    this.displayMarriage();
     forkJoin({
       applicant: this.formService.displayApplicantInfo(this.applicantID),
       education: this.formService.displayApplicantEducationInfo(this.applicantID),
@@ -203,6 +224,43 @@ export class Reaply implements OnInit {
       this.WorkingInformation.workduration = '';
     }
   }
+  downloadFile(filename: string, base64Data: string) {
+    const fileExtension = filename.split('.').pop()?.toLowerCase();
+    let mimeType = 'application/octet-stream';
+
+    switch (fileExtension) {
+      case 'pdf': mimeType = 'application/pdf'; break;
+      case 'jpg':
+      case 'jpeg': mimeType = 'image/jpeg'; break;
+      case 'png': mimeType = 'image/png'; break;
+      case 'doc': mimeType = 'application/msword'; break;
+      case 'docx': mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'; break;
+    }
+
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = Array.from(byteCharacters, c => c.charCodeAt(0));
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: mimeType });
+
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+
+    window.URL.revokeObjectURL(link.href);
+  }
+
+  convertFileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = (reader.result as string).split(',')[1];
+        resolve(base64String);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  }
   selectEligibility() {
     const selected: string[] = [];
 
@@ -240,27 +298,29 @@ export class Reaply implements OnInit {
     });
   }
   updateStatusApplication(){
-    if (this.selectedFile) {
-        this.convertFileToBase64(this.selectedFile).then((base64String) => {
-          ApplicationStatusField.filename = this.selectedFile!.name;
-          ApplicationStatusField.file_content = base64String;
-          ApplicationStatusField.potfolio_link = '';
-
-          this.InformationServices.storeApplicationStatus(ApplicationStatusField).subscribe();
-        });
-      } else if (this.ApplicationStatusField.potfolio_link) {
-        ApplicationStatusField.potfolio_link = this.ApplicationStatusField.potfolio_link;
-        ApplicationStatusField.filename = '';
-        ApplicationStatusField.file_content = '';
-
-        this.InformationServices.storeApplicationStatus(ApplicationStatusField).subscribe();
-      } else {
-        this.InformationServices.storeApplicationStatus(ApplicationStatusField).subscribe();
-      }
     this.formService.updateStatus(this.StatusID! , this.ApplicationStatusField).subscribe(() => {
       this.StatusModal = false;
-      this.displayEducation();
+      this.displayApplicationStatus();
     });
+  }
+  modifyMarriage(){
+    this.formService.updateMarriage(this.marriageID! , this.MarriageField).subscribe(() => {
+      this.MarriageModal = false;
+    });
+  }
+  displayApplicationStatus(){
+    this.formService.displayApplicationStatusInfo(this.applicantID!).subscribe((data) => {
+      this.applicationStatusList = data;
+      this.ApplicationStatusField.license = this.applicationStatusList.license;
+      this.ApplicationStatusField.lockincontract = this.applicationStatusList.lockincontract;
+      this.ApplicationStatusField.motorcycle = this.applicationStatusList.motorcycle;
+      this.ApplicationStatusField.pendingapplication = this.applicationStatusList.pendingapplication;
+      this.ApplicationStatusField.question = this.applicationStatusList.question;
+      this.ApplicationStatusField.technicalSkills = this.applicationStatusList.technicalSkills;
+      this.ApplicationStatusField.file_content = this.applicationStatusList.file_content;
+      this.ApplicationStatusField.filename = this.applicationStatusList.filename;
+      this.ApplicationStatusField.potfolio_link = this.applicationStatusList.potfolio_link;
+    })
   }
   displayWorkExperience(){
     this.formService.displayApplicantExperienceInfoAll(this.applicantID!).subscribe((data) => {
@@ -270,6 +330,17 @@ export class Reaply implements OnInit {
   displayEligibility(){
     this.formService.displayApplicantEligibilityInfo(this.applicantID!).subscribe((data) => {
       this.eligibilityList = data;
+    })
+  }
+  displayMarriage(){
+    this.formService.displayApplicantMarriageInfo(this.applicantID!).subscribe((data) => {
+      this.MarriageList = data;
+      this.MarriageField.partnerReligion = this.MarriageList.partnerReligion;
+      this.MarriageField.ageofchildren = this.MarriageList.ageofchildren;
+      this.MarriageField.child = this.MarriageList.child;
+      this.MarriageField.dateMarried = this.MarriageList.dateMarried;
+      this.MarriageField.guardianofchildren = this.MarriageList.guardianofchildren;
+      this.MarriageField.numberofchildren = this.MarriageList.numberofchildren;
     })
   }
   displayEducation(){
@@ -282,15 +353,40 @@ export class Reaply implements OnInit {
       this.EducationalField.boardexam = this.educationList.boardexam;
     })
   }
+  
   UpdateFormExperience(){
     this.formService.updateWorkExperience(this.workingID!, this.WorkingInformation).subscribe(() => {
 
     });
   }
+  async updatePotfolio() {
+    if (this.selectedFile) {
+      const base64String = await this.convertFileToBase64(this.selectedFile);
+      this.portfolioFields.filename = this.selectedFile.name;
+      this.portfolioFields.file_content = base64String;
+    }
+    this.formService.updatePorfolio(this.StatusID!, this.portfolioFields).subscribe({
+      next: () => {
+        this.PortfolioModal = false;
+        this.displayApplicationStatus();
+      },
+      error: (err) => {
+        console.error('Portfolio update failed:', err);
+      }
+    });
+  }
+
+
   updateEligibility(eligibility_i_id: number){
     if (eligibility_i_id) {
       this.eligibilityID = eligibility_i_id;
       this.EligibilityModal=true;
+    }
+  }
+  updateMarriage(marriage_i_information_id: number){
+    if (marriage_i_information_id) {
+      this.marriageID = marriage_i_information_id;
+      this.MarriageModal=true;
     }
   }
   updateStatus(applicant_i_status_id: number){
@@ -305,14 +401,29 @@ export class Reaply implements OnInit {
       this.EducationID = education_i_information_id;
     }
   }
+  updatePortfolio(applicant_i_status_id: number){
+    if (applicant_i_status_id) {
+      this.PortfolioModal = true;
+      this.StatusID = applicant_i_status_id;
+    }
+  }
   closeEligibility(){
     this.EligibilityModal = false;
   }
   closeEducation(){
     this.EducationModal = false;
   }
+  closeMarriage(){
+    this.MarriageModal = false;
+  }
   closeStatus(){
     this.StatusModal = false;
+  }
+  closePortfolio(){
+    this.PortfolioModal = false;
+  }
+  continueInterview(){
+    this.router.navigate(['/home']);
   }
   workingExperience(){
     this.WorkingInformation.applicant_i_information_id = this.applicantID!;
@@ -322,7 +433,7 @@ export class Reaply implements OnInit {
     });
   }
   openTechnicalSkills(){
-
+    this.TechnocalSkillsVisible = true;
   }
 
 }
