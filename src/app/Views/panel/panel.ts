@@ -11,11 +11,12 @@ import { Router } from '@angular/router';
 import { Disclaimer } from '../disclaimer/disclaimer';
 import { ApplicantPreview } from "../applicant-preview/applicant-preview";
 import { Validation } from '../applicantValidation/validation';
+import { VoiceInterviewComponent } from '../interview-voice/interview-voice';
 
 @Component({
   selector: 'app-panel',
   standalone: true,
-  imports: [Information, Test, CommonModule, Home, LucideAngularModule, Interview, InterviewProcess, Disclaimer, Validation],
+  imports: [Information, Test, CommonModule, Home, LucideAngularModule, Interview, InterviewProcess, Disclaimer, Validation , VoiceInterviewComponent],
   templateUrl: './panel.html',
   styleUrl: './panel.scss',
   providers: []
@@ -78,7 +79,10 @@ export class Panel implements OnInit {
     } else {
       this.showNext = true;
     }
-    
+  }
+  voice(){
+    this.step = 6;
+    sessionStorage.setItem('step', this.step.toString());
   }
 
   submitInfo() {

@@ -1,0 +1,46 @@
+<div class="flex flex-col h-full p-4 text-white">
+  <div #messagesContainer class="flex-1 overflow-y-auto mb-4">
+    <div class="flex-1 overflow-y-auto mb-4">
+      <div *ngIf="latestAssistant">
+        <div class="text-left my-2 p-3 rounded-xl max-w-[80%] bg-gray-700">
+          {{ latestAssistant.content }}
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎚 Equalizer animation when user is speaking -->
+    <div *ngIf="isRecording || isProcessingAudio" class="flex justify-center mt-4">
+      <div class="equalizer">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🎙 Record Buttons -->
+  <div class="flex items-center justify-center gap-4 py-3">
+    <button
+      *ngIf="!isRecording"
+      (click)="startRecording()"
+      class="bg-green-600 text-white px-5 py-3 rounded-xl"
+    >
+      🎙 Start Speaking
+    </button>
+    <button
+      *ngIf="isRecording"
+      (click)="stopRecording()"
+      class="bg-red-600 text-white px-5 py-3 rounded-xl"
+    >
+      ⏹ Stop
+    </button>
+    <div *ngIf="showEndButton && !interviewCompleted" class="w-full py-2 flex justify-center">
+      <button class="bg-red-600 text-white px-6 py-2 rounded-xl text-md font-semibold cursor-pointer" (click)="endInterview()">
+        End Interview
+      </button>
+    </div>
+    <div *ngIf="interviewCompleted" class="w-full py-4 flex justify-center">
+      <button class="bg-green-600 text-white px-6 py-3 rounded-xl text-lg font-semibold cursor-pointer" (click)="proceedNext()">
+        Continue to Proceed
+      </button>
+    </div>
+  </div>
+</div>

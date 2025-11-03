@@ -15,6 +15,7 @@ export const routes: Routes = [
     {path:'iqtest', component: IqtestComponent},
     {path:'evaluation', component: Interviewevaluation},
     {path:'complete', component: InterviewComplete},
+    {path:'voiceInterview', component: InterviewComplete},
     {path:'applicantPreview/:id', component: ApplicantPreview},
     {path:'previewInformation/:id', component: Reaply},
 ];

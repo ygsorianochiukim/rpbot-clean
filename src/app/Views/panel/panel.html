@@ -16,6 +16,9 @@
         <div *ngIf="step === 5" class="transition-all duration-500 ease-in-out opacity-100" [ngClass]="{ 'opacity-0 translate-x-10': step !== 5 }">
             <app-interview-process></app-interview-process>
         </div>
+        <div *ngIf="step === 6" class="transition-all duration-500 ease-in-out opacity-100" [ngClass]="{ 'opacity-0 translate-x-10': step !== 6 }">
+            <app-voice-interview></app-voice-interview>
+        </div>
     </div>
     <div class="flex justify-between mt-6">
         <div class="flex w-full gap-3 flex-flow">
@@ -39,6 +42,9 @@
             </div>
             <button *ngIf="step !== 2 && step !== 3 && step !== 5" (click)="nextStep()" class="w-full bg-accent text-white px-6 py-3 text-xl font-Playfair rounded-full">
                 Proceed
+            </button>
+            <button *ngIf="step === 4" (click)="voice()" class="w-full bg-accent text-white px-6 py-3 text-xl font-Playfair rounded-full">
+                Voice
             </button>
             <button *ngIf="step === 3" (click)="nextStep()" class="bg-accent !w-full text-white px-6 py-3 text-xl font-Playfair rounded-full cursor-pointer disabled:cursor-not-allowed" [disabled]="generalInterview != 'Done'">
                 Complete
