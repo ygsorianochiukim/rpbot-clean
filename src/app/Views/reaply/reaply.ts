@@ -39,6 +39,7 @@ export class Reaply implements OnInit {
   fromDate!: string;
   toDate!: string; 
   conversation?: Conversation;
+  workingList: WorkExperience[] = [];
   applicantID: number| null = null;
   EligibilityModal: boolean = false;
   TechnocalSkillsVisible: boolean = false;
@@ -272,6 +273,7 @@ export class Reaply implements OnInit {
       selected.push(this.otherEligibility);
     }
     this.eligibilityField.eligibility = selected.join(", ");
+    sessionStorage.setItem('eligibility', JSON.stringify(selected));
     this.formService.updateEligibility(this.eligibilityID! , this.eligibilityField).subscribe(() => {
       this.EligibilityModal = false;
       this.displayEligibility();
@@ -292,6 +294,11 @@ export class Reaply implements OnInit {
     }
   }
   modifyEducation(){
+    sessionStorage.setItem('college', this.EducationalField.college!);
+    sessionStorage.setItem('course',  this.EducationalField.course!);
+    sessionStorage.setItem('yeargraduate',  this.EducationalField.yeargraduate?.toString()!);
+    sessionStorage.setItem('graduateschool',  this.EducationalField.graduateschool?.toString()!);
+    sessionStorage.setItem('boardexam',  this.EducationalField.boardexam!);
     this.formService.updateEducation(this.EducationID! , this.EducationalField).subscribe(() => {
       this.EducationModal = false;
       this.displayEducation();
@@ -306,6 +313,12 @@ export class Reaply implements OnInit {
     });
   }
   modifyMarriage(){
+    sessionStorage.setItem('partnerReligion', this.MarriageField.partnerReligion!);
+    sessionStorage.setItem('dateMarried', this.MarriageField.dateMarried!);
+    sessionStorage.setItem('child', this.MarriageField.child!);
+    sessionStorage.setItem('numberofchildren', this.MarriageField.numberofchildren?.toString()!);
+    sessionStorage.setItem('ageofchildren', this.MarriageField.ageofchildren!);
+    sessionStorage.setItem('guardianofchildren', this.MarriageField.guardianofchildren!);
     this.formService.updateMarriage(this.marriageID! , this.MarriageField).subscribe(() => {
       this.MarriageModal = false;
     });
@@ -432,6 +445,7 @@ export class Reaply implements OnInit {
   }
   workingExperience(){
     this.WorkingInformation.applicant_i_information_id = this.applicantID!;
+    sessionStorage.setItem('workingList', JSON.stringify(this.work));
     this.formService.storeExperience(this.WorkingInformation).subscribe(() => {
       this.WorkModal = false;
       this.displayWorkExperience();

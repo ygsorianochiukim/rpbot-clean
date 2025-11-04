@@ -81,7 +81,7 @@ export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
       j => j.role.toLowerCase() === this.applicantPosition.toLowerCase()
     );
 
-    const savedMessages = sessionStorage.getItem('voiceInterviewMessages');
+    const savedMessages = sessionStorage.getItem('interviewMessages');
     if (savedMessages) {
       this.messages = JSON.parse(savedMessages);
     } else {
@@ -188,7 +188,7 @@ export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
         this.cdr.detectChanges();
         this.scrollToBottom();
 
-        if (/thank you|we’ll review your application|have a great day/i.test(reply)) {
+        if (/thank you for taking the time|we’ll review your application|have a great day/i.test(reply)) {
           this.showEndButton = true;
         }
       }, 1000);
@@ -207,9 +207,8 @@ export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
       this.shouldScroll = true;
       this.scrollToBottom();
       this.fetchPrivateRatings();
-      sessionStorage.setItem('step' , '3');
-      this.router.navigate(['/home']);
-      
+      this.showEndButton = true;
+      this.cdr.detectChanges();
     });
   }
 
@@ -237,7 +236,7 @@ export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
     return {};
   }
   private saveMessages() {
-    sessionStorage.setItem('voiceInterviewMessages', JSON.stringify(this.messages));
+    sessionStorage.setItem('interviewMessages', JSON.stringify(this.messages));
     sessionStorage.setItem('currentVoiceSectionIndex', this.currentSectionIndex.toString());
   }
   private detectSectionProgress(reply: string) {
@@ -299,15 +298,10 @@ export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
-
-      // Disable mic while assistant is speaking
       this.isRecording = false;
       this.cdr.detectChanges();
-
-      // Wait for playback to finish
       audio.onended = () => {
         console.log('🎤 Voice playback finished. Opening mic...');
-        // Give a short delay before opening the mic
         setTimeout(() => {
           this.startRecording();
           this.cdr.detectChanges();
@@ -317,13 +311,9 @@ export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
       await audio.play();
     } catch (err) {
       console.error('TTS playback error:', err);
-      // If TTS fails, immediately start recording
       this.startRecording();
     }
   }
-
-
-
   proceedNext() {
     sessionStorage.setItem('step', '3');
     location.reload();
