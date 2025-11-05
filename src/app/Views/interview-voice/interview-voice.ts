@@ -1,11 +1,4 @@
-import {
-  Component,
-  OnInit,
-  ChangeDetectorRef,
-  ViewChild,
-  ElementRef,
-  AfterViewChecked
-} from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 import { InterviewServices } from '../../Services/Interview/interview';
@@ -31,6 +24,7 @@ export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
   showEndButton = false;
   interviewCompleted = false;
   isProcessingAudio = false;
+  displaySpeaker = true;
 
   private mediaRecorder!: MediaRecorder;
   private audioChunks: BlobPart[] = [];
@@ -190,6 +184,7 @@ export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
 
         if (/thank you for taking the time|we’ll review your application|have a great day/i.test(reply)) {
           this.showEndButton = true;
+          this.displaySpeaker = false;
         }
       }, 1000);
     });
@@ -197,21 +192,28 @@ export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
 
   endInterview() {
     if (!this.selectedJob) return;
+    if (this.isRecording && this.mediaRecorder?.state !== 'inactive') {
+      this.mediaRecorder.stop();
+      this.isRecording = false;
+    }
 
     this.interviewService.sendMessage(this.messages, this.selectedJob, 'end').subscribe(res => {
       const reply = res.choices[0].message.content;
       this.messages.push({ role: 'assistant', content: reply });
       this.interviewCompleted = true;
+      this.isRecording = false;
+      this.cdr.detectChanges();
+
       this.saveMessages();
       this.playVoiceResponse(reply);
       this.shouldScroll = true;
       this.scrollToBottom();
       this.fetchPrivateRatings();
       this.showEndButton = true;
+      this.displaySpeaker = false;
       this.cdr.detectChanges();
     });
   }
-
   private fetchPrivateRatings() {
     if (!this.selectedJob) return;
 
@@ -300,8 +302,10 @@ export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
       const audio = new Audio(audioUrl);
       this.isRecording = false;
       this.cdr.detectChanges();
+
       audio.onended = () => {
-        console.log('🎤 Voice playback finished. Opening mic...');
+        console.log('🎤 Voice playback finished.');
+        if (this.interviewCompleted) return;
         setTimeout(() => {
           this.startRecording();
           this.cdr.detectChanges();
@@ -311,7 +315,7 @@ export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
       await audio.play();
     } catch (err) {
       console.error('TTS playback error:', err);
-      this.startRecording();
+      if (!this.interviewCompleted) this.startRecording();
     }
   }
   proceedNext() {

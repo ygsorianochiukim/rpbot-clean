@@ -178,7 +178,7 @@ export const GPTPrompts =
     1 = Untrained — lacks understanding or usable technical skill.
 
     ### Special Rules
-    - If applicant ends interview early →  
+    - If applicant ends interview early do not display on interview just only store in serssion→  
       {
         "ambition": 1,
         "influence": 1,
@@ -188,6 +188,7 @@ export const GPTPrompts =
         "technicalSkills": 1,
         "commentary": "Applicant ended interview prematurely before completion."
       }
+    - Do not ever display the ratings even the applicant ended the interview Only store in the session.
     - If contradictions found between answers and provided session data → lower **Discipline** by 1 point.
     - Ratings must never be revealed during the interview.
     - Only output scores in JSON when explicitly requested: "Give me private ratings for this applicant".

@@ -466,15 +466,13 @@ export class Information implements OnInit {
         this.convertFileToBase64(this.selectedFile).then((base64String) => {
           applicationStatus.filename = this.selectedFile!.name;
           applicationStatus.file_content = base64String;
-          applicationStatus.potfolio_link = '';
+          sessionStorage.setItem('file_name' , applicationStatus.filename);
 
           this.InformationServices.storeApplicationStatus(applicationStatus).subscribe();
         });
       } else if (this.ApplicationStatusField.potfolio_link) {
         applicationStatus.potfolio_link = this.ApplicationStatusField.potfolio_link;
-        applicationStatus.filename = '';
-        applicationStatus.file_content = '';
-
+        sessionStorage.setItem('file_name' , applicationStatus.potfolio_link);
         this.InformationServices.storeApplicationStatus(applicationStatus).subscribe();
       } else {
         this.InformationServices.storeApplicationStatus(applicationStatus).subscribe();

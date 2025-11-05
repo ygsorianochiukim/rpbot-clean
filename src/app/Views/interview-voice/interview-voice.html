@@ -7,31 +7,21 @@
         </div>
       </div>
     </div>
-
-    <!-- 🎚 Equalizer animation when user is speaking -->
     <div *ngIf="isRecording || isProcessingAudio" class="flex justify-center mt-4">
       <div class="equalizer">
         <span></span><span></span><span></span><span></span><span></span>
       </div>
     </div>
   </div>
-
-  <!-- 🎙 Record Buttons -->
   <div class="flex items-center justify-center gap-4 py-3">
-    <button
-      *ngIf="!isRecording"
-      (click)="startRecording()"
-      class="bg-green-600 text-white px-5 py-3 rounded-xl"
-    >
-      🎙 Start Speaking
-    </button>
-    <button
-      *ngIf="isRecording"
-      (click)="stopRecording()"
-      class="bg-red-600 text-white px-5 py-3 rounded-xl"
-    >
-      ⏹ Stop
-    </button>
+    <div *ngIf="displaySpeaker">
+      <button *ngIf="!isRecording" (click)="startRecording()" class="bg-green-600 text-white px-5 py-3 rounded-xl">
+        🎙 Start Speaking
+      </button>
+      <button *ngIf="isRecording" (click)="stopRecording()" class="bg-red-600 text-white px-5 py-3 rounded-xl">
+        ⏹ Stop
+      </button>
+    </div>
     <div *ngIf="showEndButton && !interviewCompleted" class="w-full py-2 flex justify-center">
       <button class="bg-red-600 text-white px-6 py-2 rounded-xl text-md font-semibold cursor-pointer" (click)="endInterview()">
         End Interview
