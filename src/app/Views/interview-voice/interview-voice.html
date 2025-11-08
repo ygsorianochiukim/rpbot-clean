@@ -15,9 +15,9 @@
   </div>
   <div class="flex items-center justify-center gap-4 py-3">
     <div *ngIf="displaySpeaker">
-      <button *ngIf="!isRecording" (click)="startRecording()" class="bg-green-600 text-white px-5 py-3 rounded-xl">
+      <!-- <button *ngIf="!isRecording" (click)="startRecording()" class="bg-green-600 text-white px-5 py-3 rounded-xl">
         🎙 Start Speaking
-      </button>
+      </button> -->
       <button *ngIf="isRecording" (click)="stopRecording()" class="bg-red-600 text-white px-5 py-3 rounded-xl">
         ⏹ Stop
       </button>
