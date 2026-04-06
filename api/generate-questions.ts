@@ -35,13 +35,11 @@ Each question must follow this format:
     try {
       parsed = JSON.parse(content);
     } catch (e) {
-      console.error('❌ JSON Parse Error:', e, content);
       return res.status(500).json({ error: 'Invalid JSON response from OpenAI' });
     }
 
     return res.status(200).json(parsed);
   } catch (err: any) {
-    console.error('❌ OpenAI API Error:', err);
     return res.status(500).json({ error: err.message || 'Internal Server Error' });
   }
 }

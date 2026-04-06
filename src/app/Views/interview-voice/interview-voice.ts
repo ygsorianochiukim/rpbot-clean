@@ -1,28 +1,41 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
-import { LucideAngularModule, Send } from "lucide-angular";
-import { InterviewServices } from '../../Services/Interview/interview';
-import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Jobs } from '../../Data/Job/job.data';
+import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
+import { InterviewServices } from '../../Services/Interview/interview';
 import { Job } from '../../Model/Job/job';
+import { Jobs } from '../../Data/Job/job.data';
 import { Router } from '@angular/router';
+import { LucideAngularModule, Mic, StopCircle } from 'lucide-angular';
 
 @Component({
-  selector: 'app-interview-process',
+  selector: 'app-voice-interview',
   standalone: true,
-  imports: [LucideAngularModule, HttpClientModule, CommonModule, FormsModule],
-  templateUrl: './interview-process.html',
-  styleUrls: ['./interview-process.scss'],
+  imports: [CommonModule, HttpClientModule, LucideAngularModule],
+  templateUrl: './interview-voice.html',
+  styleUrls: ['./interview-voice.scss'],
   providers: [InterviewServices]
 })
-export class InterviewProcess implements OnInit, AfterViewChecked {
-  readonly Send = Send;
-  isTyping = false;
-  showEndButton = false;
+export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
+  readonly Mic = Mic;
+  readonly StopCircle = StopCircle;
   messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [];
-  userInput = '';
+  isTyping = false;
+  isRecording = false;
+  showEndButton = false;
   interviewCompleted = false;
+  isProcessingAudio = false;
+  displaySpeaker = true;
+
+  private mediaRecorder!: MediaRecorder;
+  private audioChunks: BlobPart[] = [];
+
+  applicantName = '';
+  applicantPosition = '';
+  selectedJob: Job | undefined;
+  jobs = Jobs;
+
+  userInput = '';
+  openaiKey = '';
 
   interviewSections = [
     'Introduction & influences',
@@ -42,23 +55,25 @@ export class InterviewProcess implements OnInit, AfterViewChecked {
   currentSectionIndex = 0;
   progressPercent = 0;
   currentSection = this.interviewSections[0];
-  applicantName = '';
-  applicantPosition = '';
-  selectedJob: Job | undefined;
-  jobs = Jobs;
   private shouldScroll = false;
-  @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
+  @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
+  get latestAssistant() {
+    return [...this.messages].reverse().find(m => m.role === 'assistant') || null;
+  }
   constructor(
-    private interviewService: InterviewServices,
+    private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private interviewService: InterviewServices
   ) {}
 
   ngOnInit() {
     this.applicantName = sessionStorage.getItem('applicantName') ?? 'Applicant';
     this.applicantPosition = sessionStorage.getItem('applicantPosition') ?? 'Position';
-    this.selectedJob = this.jobs.find(j => j.role.toLowerCase() === this.applicantPosition.toLowerCase());
+    this.selectedJob = this.jobs.find(
+      j => j.role.toLowerCase() === this.applicantPosition.toLowerCase()
+    );
 
     const savedMessages = sessionStorage.getItem('interviewMessages');
     if (savedMessages) {
@@ -67,7 +82,7 @@ export class InterviewProcess implements OnInit, AfterViewChecked {
       this.startInterview();
     }
 
-    const savedIndex = sessionStorage.getItem('currentSectionIndex');
+    const savedIndex = sessionStorage.getItem('currentVoiceSectionIndex');
     if (savedIndex) {
       this.currentSectionIndex = +savedIndex;
       this.currentSection = this.interviewSections[this.currentSectionIndex];
@@ -89,35 +104,79 @@ export class InterviewProcess implements OnInit, AfterViewChecked {
       const reply = res.choices[0].message.content;
       this.messages.push({ role: 'assistant', content: reply });
       this.saveMessages();
+      this.playVoiceResponse(reply);
       this.shouldScroll = true;
       this.cdr.detectChanges();
     });
   }
 
+  startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      this.mediaRecorder = new MediaRecorder(stream);
+      this.audioChunks = [];
+      this.mediaRecorder.ondataavailable = e => this.audioChunks.push(e.data);
+      this.mediaRecorder.onstop = () => this.processAudio();
+      this.mediaRecorder.start();
+      this.isRecording = true;
+      this.cdr.detectChanges();
+    });
+  }
+
+  stopRecording() {
+    if (this.isRecording && this.mediaRecorder.state !== 'inactive') {
+      this.mediaRecorder.stop();
+      this.isRecording = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async processAudio() {
+    const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+    const formData = new FormData();
+    formData.append('file', audioBlob, 'input.webm');
+    formData.append('model', 'whisper-1');
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.openaiKey}`
+    });
+
+    this.isProcessingAudio = true;
+    this.cdr.detectChanges();
+
+    try {
+      const res: any = await this.http
+        .post('https://api.openai.com/v1/audio/transcriptions', formData, { headers })
+        .toPromise();
+
+      this.userInput = res.text;
+      this.messages.push({ role: 'user', content: this.userInput });
+      this.isProcessingAudio = false;
+      this.cdr.detectChanges();
+      this.sendMessage();
+    } catch (err) {
+      console.error('Whisper error:', err);
+      this.isProcessingAudio = false;
+    }
+  }
+
   sendMessage() {
     if (!this.userInput.trim() || !this.selectedJob) return;
-
     const userMessage = this.userInput.trim();
-    this.messages.push({ role: 'user', content: userMessage });
-    this.saveMessages();
-    this.userInput = '';
-    this.shouldScroll = true;
 
-    if (["end"].includes(userMessage.toLowerCase())) {
+    if (userMessage.toLowerCase() === 'end') {
       this.endInterview();
       return;
     }
 
     this.isTyping = true;
-
     this.interviewService.sendMessage(this.messages, this.selectedJob, userMessage).subscribe(res => {
       const reply = res.choices[0].message.content;
-
       setTimeout(() => {
         this.messages.push({ role: 'assistant', content: reply });
         this.detectSectionProgress(reply);
         this.updateSectionProgress();
         this.saveMessages();
+        this.playVoiceResponse(reply);
         this.isTyping = false;
         this.shouldScroll = true;
         this.cdr.detectChanges();
@@ -125,83 +184,66 @@ export class InterviewProcess implements OnInit, AfterViewChecked {
 
         if (/thank you for taking the time|we’ll review your application|have a great day/i.test(reply)) {
           this.showEndButton = true;
+          this.displaySpeaker = false;
         }
-      }, 2000);
+      }, 1000);
     });
   }
 
   endInterview() {
     if (!this.selectedJob) return;
+    if (this.isRecording && this.mediaRecorder?.state !== 'inactive') {
+      this.mediaRecorder.stop();
+      this.isRecording = false;
+    }
 
     this.interviewService.sendMessage(this.messages, this.selectedJob, 'end').subscribe(res => {
       const reply = res.choices[0].message.content;
       this.messages.push({ role: 'assistant', content: reply });
       this.interviewCompleted = true;
-      this.saveMessages();
-      this.shouldScroll = true;
+      this.isRecording = false;
       this.cdr.detectChanges();
+
+      this.saveMessages();
+      this.playVoiceResponse(reply);
+      this.shouldScroll = true;
       this.scrollToBottom();
       this.fetchPrivateRatings();
+      this.showEndButton = true;
+      this.displaySpeaker = false;
+      this.cdr.detectChanges();
     });
   }
-
   private fetchPrivateRatings() {
     if (!this.selectedJob) return;
-
     this.interviewService.sendMessage(this.messages, this.selectedJob, 'ratings').subscribe(res => {
       const evalText = res.choices[0].message.content;
       const ratings = this.extractRatings(evalText);
-      sessionStorage.setItem('evaluationRatings', JSON.stringify(ratings));
-      sessionStorage.setItem('generalInterview', 'Done');
+      if (ratings && Object.keys(ratings).length > 0) {
+        sessionStorage.setItem('evaluationRatings', JSON.stringify(ratings));
+        sessionStorage.setItem('generalInterview', 'Done');
+      } else {
+        console.warn('⚠️ No valid ratings JSON found.');
+      }
     });
   }
-
-  private extractRatings(evalText: string): {
-    ambition: number;
-    influence: number;
-    discipline: number;
-    skillsDevelopment: number;
-    care: number;
-    technicalSkills: number;
-    commentary?: string;
-  } {
+  private extractRatings(evalText: string) {
     try {
       const jsonStart = evalText.indexOf('{');
       const jsonEnd = evalText.lastIndexOf('}') + 1;
       if (jsonStart >= 0 && jsonEnd > jsonStart) {
         const jsonString = evalText.substring(jsonStart, jsonEnd);
-        const data = JSON.parse(jsonString);
-
-        return {
-          ambition: data.ambition ?? 0,
-          influence: data.influence ?? 0,
-          discipline: data.discipline ?? 0,
-          skillsDevelopment: data.skillsDevelopment ?? 0,
-          care: data.care ?? 0,
-          technicalSkills: data.technicalSkills ?? 0,
-          commentary: data.commentary ?? ''
-        };
+        return JSON.parse(jsonString);
       }
     } catch (e) {
       console.error('Failed to parse ratings JSON', e);
     }
-
-    return {
-      ambition: 0,
-      influence: 0,
-      discipline: 0,
-      skillsDevelopment: 0,
-      care: 0,
-      technicalSkills: 0
-    };
+    return {};
   }
-
-
   private saveMessages() {
     sessionStorage.setItem('interviewMessages', JSON.stringify(this.messages));
-    sessionStorage.setItem('currentSectionIndex', this.currentSectionIndex.toString());
+    sessionStorage.setItem('currentVoiceSectionIndex', this.currentSectionIndex.toString());
   }
-
   private detectSectionProgress(reply: string) {
     const checkpoints = [
       { keyword: /introduce|background/i, index: 0 },
@@ -243,8 +285,42 @@ export class InterviewProcess implements OnInit, AfterViewChecked {
     }, 150);
   }
 
+  private async playVoiceResponse(text: string) {
+    try {
+      const response = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.openaiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini-tts',
+          voice: 'alloy',
+          input: text
+        })
+      });
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      this.isRecording = false;
+      this.cdr.detectChanges();
+
+      audio.onended = () => {
+        if (this.interviewCompleted) return;
+        setTimeout(() => {
+          this.startRecording();
+          this.cdr.detectChanges();
+        }, 800);
+      };
+
+      await audio.play();
+    } catch (err) {
+      console.error('TTS playback error:', err);
+      if (!this.interviewCompleted) this.startRecording();
+    }
+  }
   proceedNext() {
-    this.endInterview();
     sessionStorage.setItem('step', '3');
     location.reload();
   }
