@@ -13,14 +13,45 @@ export const Jobs:Job[] =[
         salaryBudget: '20000/month'
     },
     {
+        role: 'Architectural Designer',
+        qualifications: [
+            'Any relevant course; portfolio-based qualification accepted',
+            'Strong aesthetic eye with a modern-classic or classical design sensibility',
+            'Basic knowledge of space planning and material selection',
+            'Proficient in SketchUp (preferred); familiarity with AutoCAD is a plus',
+            'Working knowledge of Canva and PowerPoint for presentations',
+        ],
+        salaryBudget: '19000/month'
+    },
+    {
+        role: 'Heavy Equipment Mechanic',
+        qualifications: [
+            'Experience in heavy equipment repair with strong mechanical and troubleshooting skills',
+            'Knowledge of diesel engines, hydraulic, and electrical systems',
+            'Ability to use diagnostic tools and interpret service manuals',
+            'Valid driver’s license (CDL is a plus) and willingness to stay on-site',
+        ],
+        salaryBudget: '673.32/month'
+    },
+    {
+        role: 'Kasambahay',
+        qualifications: [
+            'Female, responsible, and hardworking',
+            'Willing to work full-time with stay-in arrangement',
+            'Basic knowledge of household chores',
+            'Trustworthy and willing to learn',
+        ],
+        salaryBudget: '7000/month'
+    },
+    {
         role: 'IT Staff',
         qualifications: [
-            'A degree in Information Technology or a related field',
-            'Working knowledge of database systems',
-            'Familiar with the System Development Life Cycle(SDLC)',
-            'Experience in preparing structures Reports',
+            'Experience in IT support, system, and network administration',
+            'Strong troubleshooting and monitoring skills to ensure system stability and uptime',
+            'Experience in backup management, restore testing, and disaster recovery planning',
+            'Ability to integrate IP CCTV, sensors/IoT devices, and AI tools into practical business systems',
         ],
-        salaryBudget: '15000/month'
+        salaryBudget: '17000/month'
     },
     {
         role: 'HR Staff',
@@ -170,6 +201,16 @@ export const Jobs:Job[] =[
         salaryBudget: '13000/month'
     },
     {
+        role: 'Software Developer',
+        qualifications: [
+            'A degree in Information Technology or a related field',
+            'Working knowledge of database systems',
+            'Familiar with the System Development Life Cycle(SDLC)',
+            'Working knowledge with different programming languages',
+        ],
+        salaryBudget: '20000/month'
+    },
+    {
         role: 'Treasury Staff',
         qualifications: [
             'Bachelors degree in Accounting, Finance, or related field',
@@ -189,5 +230,71 @@ export const Jobs:Job[] =[
         ],
         salaryBudget: '15000/month'
     },
-    
+    {
+        role: 'Welder',
+        qualifications: [
+            'Knowledge in basic welding techniques',
+            'Ability to use welding tools and equipment',
+            'Physically fit and able to work safely',
+            'With or without experience'
+        ],
+        salaryBudget: '650/day'
+    },
+    {
+        role: 'Funeral Marshal',
+        qualifications: [
+            'Physically fit and able to perform duties professionally',
+            'Ability to manage crowds and maintain order during services',
+            'Knowledge of funeral protocols and safety procedures',
+            'Able to assist in enforcing site safety rules and respond during emergencies'
+        ],
+        salaryBudget: '467.57/ day'
+    },
+    {
+        role: 'Painter',
+        qualifications: [
+            'At least High School graduate',
+            'Relevant trade experience in painting or related work',
+            'Physically fit and safety-conscious',
+            'Able to use painting tools and materials properly',
+            'Can follow plans, specifications, and quality standards'
+        ],
+        salaryBudget: '575 / day'
+    },
+    {
+        role: 'Operations checker',
+        qualifications: [
+            'Hands-on experience in site operations, facilities, construction, landscaping, or similar field-based work',
+            'Proven ability to lead and supervise people on the ground',
+            'Observant, disciplined, and firm in enforcing standards and correcting issues in real time',
+            'Practical and cost-conscious; able to identify waste, inefficiencies, and preventable expenses',
+            'Strong judgment and professionalism, with respect for the nature of interment services',
+            'Clear and effective communication with both on-ground teams and management'
+        ],
+        salaryBudget: '20199/month'
+    },
+    {
+        role: 'Digital Marketing Lead',
+        qualifications: [
+            'Strong branding sense and market intuition',
+            'Solid understanding of digital marketing fundamentals',
+            'Skilled in Canva and basic editing tools for rapid creative testing',
+            'Strong visual judgment and attention to detail',
+            'Analytical thinker able to evaluate creative performance',
+            'Disciplined and able to execute cohesive digital experiences with minimal supervision'
+        ],
+        salaryBudget: '22000/month'
+    },
+    {
+        role: 'Project Coordinator Staff',
+        qualifications: [
+            'Detail-oriented and analytical with strong data review skills',
+            'Able to identify risks and inconsistencies early and act proactively',
+            'Provides clear and timely feedback to operations and management',
+            'Coordinates effectively across teams to ensure accountability',
+            'Skilled in using Gantt charts, basic budgeting, and audits for project tracking',
+            'Comfortable with mobile and cloud-based systems to ensure project closure'
+        ],
+        salaryBudget: '13849.06/month'
+    }
 ]

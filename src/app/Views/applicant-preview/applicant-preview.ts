@@ -16,6 +16,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { Sms } from '../../Services/SMS/sms';
+import { Otp } from '../../Model/SmsOtp/otp.model';
 
 @Component({
   selector: 'app-applicant-preview',
@@ -23,7 +25,7 @@ import { ActivatedRoute } from '@angular/router';
   imports: [HttpClientModule, CommonModule, FormsModule],
   templateUrl: './applicant-preview.html',
   styleUrls: ['./applicant-preview.scss'],
-  providers: [FormSubmission]
+  providers: [FormSubmission, Sms]
 })
 export class ApplicantPreview implements OnInit {
   applicant?: InformationModel;
@@ -37,8 +39,13 @@ export class ApplicantPreview implements OnInit {
   conversation?: Conversation;
 
   loading = true;
+  SmsUpdate: Otp = {
+    number: '',
+    status: '',
+    position: '',
+  }
 
-  constructor(private formService: FormSubmission, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
+  constructor(private formService: FormSubmission, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private SMSServices : Sms) {}
 
   ngOnInit(): void {
     const id =  Number(this.route.snapshot.paramMap.get('id')) || 0
@@ -72,5 +79,17 @@ export class ApplicantPreview implements OnInit {
         this.loading = false;
       }
     });
+  }
+  sendHiredConfirmation(){
+    this.SmsUpdate.number = this.applicant?.contactnumber;
+    this.SmsUpdate.position = this.applicant?.desiredPosition;
+    this.SmsUpdate.status = "Passed";
+    this.SMSServices.sentConfirmationUpdate(this.SmsUpdate).subscribe(() => {});
+  }
+  sendRejectConfirmation(){
+    this.SmsUpdate.number = this.applicant?.contactnumber;
+    this.SmsUpdate.position = this.applicant?.desiredPosition;
+    this.SmsUpdate.status = "Failed";
+    this.SMSServices.sentConfirmationUpdate(this.SmsUpdate).subscribe(() => {});
   }
 }

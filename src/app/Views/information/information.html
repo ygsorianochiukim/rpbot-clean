@@ -7,7 +7,7 @@
                         Applicant Information
                     </header>
                 </div>
-                <form (ngSubmit)="submitInformation()">
+                <form>
                     <div class="flex flex-row gap-2">
                         <div class="w-2/4">
                             <label for="" class="text-lg font-Lora text-white">First Name <span class="text-red-700">*</span></label>
@@ -81,23 +81,32 @@
                             <option value="">-Select Available Position-</option>
                             <option value="Accounting Staff">Accounting Staff</option>
                             <option value="Architect">Architect</option>
+                            <option value="Architectural Designer">Architectural Designer</option>
                             <option value="Audit Staff">Audit Staff</option>
                             <option value="Backhoe Driver/Mechanic">Backhoe Driver/Mechanic</option>
                             <option value="Business Process Manualization Supervisor">Business Process Manualization Supervisor</option>
                             <option value="Civil Engineer">Civil Engineer</option>
                             <option value="Custodianship Staff">Custodianship Staff</option>
+                            <option value="Digital Marketing Lead">Digital Marketing Lead</option>
                             <option value="Driver/Mechanic">Driver/Mechanic</option>
+                            <option value="Funeral Marshal">Funeral Marshal</option>
                             <option value="Graphic Designer">Graphic Designer</option>
+                            <option value="Heavy Equipment Mechanic">Heavy Equipment Mechanic</option>
                             <option value="HR Staff">HR Staff</option>
                             <option value="IS Business Process Manualization">IS Business Process Manualization</option>
                             <option value="IT Staff">IT Staff</option>
+                            <option value="Kasambahay">Kasambahay</option>
                             <option value="Laborer">Laborer</option>
                             <option value="Landscaper">Landscaper</option>
+                            <option value="Painter">Painter</option>
                             <option value="Planning Staff">Planning Staff</option>
+                            <option value="Project Coordinator Staff">Project Coordinator Staff</option>
                             <option value="Purchasing Staff">Purchasing Staff</option>
+                            <option value="Operations checker">Operations checker</option>
                             <option value="Skilled Mason">Skilled Mason</option>
+                            <option value="Software Developer">Software Developer</option>
                             <option value="Treasury Staff">Treasury Staff</option>
-                            
+                            <option value="Welder">Welder</option>
                         </select>
                     </div>
                     <div class="flex flex-row gap-2">
@@ -175,9 +184,10 @@
                         <label for="" class="text-lg font-Lora text-white">Expected Salary <span class="text-red-700">*</span></label>
                         <input type="text" name="expectedsalary" [(ngModel)]="applicantinformation.expectedSalary" id="" class="w-full p-2 bg-primary rounded-md outline-none" placeholder="Expected Salary" required>
                     </div>
-                    <button class="w-full bg-accent text-white p-2 rounded-full font-Playfair font-semibold mt-3 ">Next</button>
+                    <button class="w-full bg-accent text-white p-2 rounded-full font-Playfair font-semibold mt-3" (click)="openOTPModal()">Next</button>
                 </form>
             </div>
+            
             <div *ngIf="displayForm == 2" class="w-full">
                 <span (click)="previousForm()" class="text-white cursor-pointer">Back</span>
                 <header class="font-Playfair text-2xl mt-3 text-white border-b-2 pb-1">Eligibility <span class="text-red-700">*</span></header>
@@ -277,11 +287,11 @@
                         <div class="flex flex-row gap-2">
                             <div class="w-2/3">
                                 <label for="" class="text-lg font-Lora text-white">What is your partner's religion?</label>
-                                <input type="text" name="partnerReligion" [(ngModel)]="MarriageField.partnerReligion" id="" class="w-full p-2 bg-primary rounded-md outline-none" placeholder="First Name">
+                                <input type="text" name="partnerReligion" [(ngModel)]="MarriageField.partnerReligion" id="" class="w-full p-2 bg-primary rounded-md outline-none" placeholder="Religion">
                             </div>
                             <div class="w-1/3">
                                 <label for="" class="text-lg font-Lora text-white">Date Marriage</label>
-                                <input type="date" name="dateMarried" [(ngModel)]="MarriageField.dateMarried" id="" class="w-full p-2 bg-primary rounded-md outline-none" placeholder="Middle Name">
+                                <input type="date" name="dateMarried" [(ngModel)]="MarriageField.dateMarried" id="" class="w-full p-2 bg-primary rounded-md outline-none">
                             </div>
                         </div>
                         <header class="font-Playfair text-2xl mt-3 text-white border-b-2 pb-1">Do you have a child</header>
@@ -307,11 +317,11 @@
                         </div>
                         <div class="mt-2">
                             <label for="" class="text-lg font-Lora text-white text-justify">Age of Children?</label>
-                            <input type="text" name="ageofchildren" [(ngModel)]="MarriageField.ageofchildren" id="" class="w-full p-2 bg-primary rounded-md outline-none" placeholder="No. of Children">
+                            <input type="text" name="ageofchildren" [(ngModel)]="MarriageField.ageofchildren" id="" class="w-full p-2 bg-primary rounded-md outline-none" placeholder="Age of Childrens">
                         </div>
                         <div class="mt-2">
                             <label for="" class="text-lg font-Lora text-white text-justify">Who is taking care of your dependents while you are working?</label>
-                            <input type="text" name="guardianofchildren" [(ngModel)]="MarriageField.guardianofchildren" id="" class="w-full p-2 bg-primary rounded-md outline-none" placeholder="No. of Children">
+                            <input type="text" name="guardianofchildren" [(ngModel)]="MarriageField.guardianofchildren" id="" class="w-full p-2 bg-primary rounded-md outline-none" placeholder="">
                         </div>
                     }
                     <button (click)="nextStep()" class="w-full bg-accent text-white p-2 rounded-full font-Playfair font-semibold mt-3 ">Next</button>
@@ -490,6 +500,19 @@
                     </button>
                 </div>
             </div>
+        </form>
+    </div>
+</div>
+<div *ngIf="otpModal" class="w-full flex flex-row justify-center items-center block fixed top-0 right-0 left-0 h-full bg-black/50">
+    <div class="w-2/5 p-5 bg-primary rounded-xl">
+        <form (ngSubmit)="submitInformation()">
+            <div>
+                <label for="">Verify OTP</label>
+                <input type="text" name="otpInput" [(ngModel)]="otpInput" class="w-full p-2 border rounded-xl mt-1 placeholder:text-gray-400" id="" placeholder="OTP">
+            </div>
+            <button class="bg-accent w-full rounded-full text-white mt-3 p-3 disabled:!bg-gray-400" [disabled]="generatedOTP != otpInput">
+                Verify OTP
+            </button>
         </form>
     </div>
 </div>

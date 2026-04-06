@@ -3,7 +3,6 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule , ChevronLeft , CircleX , PlusCircle } from 'lucide-angular';
 import { AddressServices } from '../../Services/Address/address';
-import { CitiesModel } from '../../Model/Address/cities/cities.model';
 import { InformationModel } from '../../Model/Information/information.model';
 import { Eligibility } from '../../Model/Information/Eligibility/eligibility.model';
 import { Education } from '../../Model/Information/Education/education.model';
@@ -14,6 +13,8 @@ import { FormSubmission } from '../../Services/form-submission';
 import { AnyARecord } from 'dns';
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { finalize, timeout } from 'rxjs';
+import { Sms } from '../../Services/SMS/sms';
+import { Otp } from '../../Model/SmsOtp/otp.model';
 
 @Component({
   selector: 'app-information',
@@ -21,7 +22,7 @@ import { finalize, timeout } from 'rxjs';
   imports: [FormsModule, CommonModule, LucideAngularModule, LoaderComponent],
   templateUrl: './information.html',
   styleUrls: ['./information.scss'],
-  providers: [AddressServices, FormSubmission]
+  providers: [AddressServices, FormSubmission , Sms]
 })
 export class Information implements OnInit {
   readonly back = ChevronLeft;
@@ -46,6 +47,9 @@ export class Information implements OnInit {
   datastored:boolean = true;
   fromDate!: string;
   toDate!: string; 
+  otpModal: boolean = false;
+  otpInput: string = '';
+  generatedOTP: string = '';  
   ApplicationStatusField: ApplicationStatus ={
     pendingapplication: '',
     lockincontract: '',
@@ -135,6 +139,10 @@ export class Information implements OnInit {
   eligibilityField: Eligibility={
     eligibility: '',
   }
+  SendOtp : Otp = {
+    number: '',
+    otp: ''
+  }
   displayAddress: any[] = [];
   displayCity: any[] = [];
   displayBarangay: any[] = [];
@@ -144,7 +152,7 @@ export class Information implements OnInit {
   barangayField: any;
 
   otherEligibility: string = '';
-  constructor(private AddressServices: AddressServices , private InformationServices: FormSubmission) {}
+  constructor(private AddressServices: AddressServices , private InformationServices: FormSubmission , private sentSMSServices : Sms) {}
 
   async ngOnInit(): Promise<void> {
     this.technicalOptionKeys = Object.keys(this.technicalOptions);
@@ -255,21 +263,6 @@ export class Information implements OnInit {
     this.WorkExperienceFieldStatus = false;
   }
   submitInformation() {
-
-    if (this.provinceField) this.applicantinformation.province = this.provinceField.name;
-    if (this.municipalityField) this.applicantinformation.cities = this.municipalityField.name;
-    if (this.barangayField) this.applicantinformation.barangay = this.barangayField.name;
-    const requiredFields = [
-      'firstname', 'middlename', 'lastname', 'email', 'civilStatus', 
-      'contactnumber', 'birthdate', 'religion', 'province', 
-      'cities', 'barangay', 'positionSelected'
-    ];
-    for (const field of requiredFields) {
-      if (!this.applicantinformation[field as keyof typeof this.applicantinformation]) {
-        alert(`Please fill in your ${field}.`);
-        return;
-      }
-    }
     this.displayForm++;
     sessionStorage.setItem('form', this.displayForm.toString());
     this.applicantinformation.applicantName = `${this.applicantinformation.firstname} ${this.applicantinformation.middlename} ${this.applicantinformation.lastname}`;
@@ -295,6 +288,7 @@ export class Information implements OnInit {
     sessionStorage.setItem('nickname', this.applicantinformation.nickname?.toString() ?? '');
 
     alert('Information submitted successfully!');
+    this.otpModal = false;
   }
 
   workingExperience() {
@@ -484,6 +478,33 @@ export class Information implements OnInit {
     });
     sessionStorage.setItem('DataStored', 'true');
     this.datastored = false;
+  }
+  sendOTP() {
+    this.generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+    this.SendOtp.otp = this.generatedOTP;
+    this.SendOtp.number = this.applicantinformation.contactnumber!;
+    this.sentSMSServices.sentOtp(this.SendOtp).subscribe(() => {
+
+    });
+  }
+  openOTPModal() {
+    
+    if (this.provinceField) this.applicantinformation.province = this.provinceField.name;
+    if (this.municipalityField) this.applicantinformation.cities = this.municipalityField.name;
+    if (this.barangayField) this.applicantinformation.barangay = this.barangayField.name;
+    const requiredFields = [
+      'firstname', 'middlename', 'lastname', 'email', 'civilStatus', 
+      'contactnumber', 'birthdate', 'religion', 'province', 
+      'cities', 'barangay', 'positionSelected'
+    ];
+    for (const field of requiredFields) {
+      if (!this.applicantinformation[field as keyof typeof this.applicantinformation]) {
+        alert(`Please fill in your ${field}.`);
+        return;
+      }
+    }
+    this.otpModal = true;
+    this.sendOTP();
   }
 
 }

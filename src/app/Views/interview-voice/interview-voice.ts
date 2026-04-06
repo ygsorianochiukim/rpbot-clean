@@ -18,7 +18,7 @@ import { LucideAngularModule, Mic, StopCircle } from 'lucide-angular';
 export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
   readonly Mic = Mic;
   readonly StopCircle = StopCircle;
-  messages: { role: string; content: string }[] = [];
+  messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [];
   isTyping = false;
   isRecording = false;
   showEndButton = false;
@@ -216,12 +216,15 @@ export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
   }
   private fetchPrivateRatings() {
     if (!this.selectedJob) return;
-
     this.interviewService.sendMessage(this.messages, this.selectedJob, 'ratings').subscribe(res => {
       const evalText = res.choices[0].message.content;
       const ratings = this.extractRatings(evalText);
-      sessionStorage.setItem('evaluationRatings', JSON.stringify(ratings));
-      sessionStorage.setItem('generalInterview', 'Done');
+      if (ratings && Object.keys(ratings).length > 0) {
+        sessionStorage.setItem('evaluationRatings', JSON.stringify(ratings));
+        sessionStorage.setItem('generalInterview', 'Done');
+      } else {
+        console.warn('⚠️ No valid ratings JSON found.');
+      }
     });
   }
   private extractRatings(evalText: string) {
@@ -304,7 +307,6 @@ export class VoiceInterviewComponent implements OnInit, AfterViewChecked {
       this.cdr.detectChanges();
 
       audio.onended = () => {
-        console.log('🎤 Voice playback finished.');
         if (this.interviewCompleted) return;
         setTimeout(() => {
           this.startRecording();

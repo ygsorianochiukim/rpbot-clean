@@ -20,7 +20,7 @@ export class InterviewProcess implements OnInit, AfterViewChecked {
   readonly Send = Send;
   isTyping = false;
   showEndButton = false;
-  messages: { role: string; content: string }[] = [];
+  messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [];
   userInput = '';
   interviewCompleted = false;
 
@@ -244,6 +244,7 @@ export class InterviewProcess implements OnInit, AfterViewChecked {
   }
 
   proceedNext() {
+    this.endInterview();
     sessionStorage.setItem('step', '3');
     location.reload();
   }
