@@ -296,5 +296,29 @@ export const Jobs:Job[] =[
             'Comfortable with mobile and cloud-based systems to ensure project closure'
         ],
         salaryBudget: '13849.06/month'
-    }
+    },
+    {
+        role: 'Computer Engineer',
+        qualifications: [
+            'Experience in smart technology systems (hardware, software, sensors, cameras, databases)',
+            'Skilled in setup, troubleshooting, maintenance, and system improvement',
+            'Knowledge of connected devices and integrated systems',
+            'Familiar with drones and AI-powered technologies (preferred)',
+            'Detail-oriented with strong analytical and problem-solving skills',
+            'Comfortable with mobile and cloud-based systems'
+        ],
+        salaryBudget: '21000/month'
+    },
+    {
+    role: 'UI/UX Developer',
+    qualifications: [
+        'Experience in designing user-friendly websites, dashboards, and digital systems',
+        'Strong skills in UI/UX design, wireframing, and user flow creation',
+        'Proficient in frontend development and responsive design',
+        'Ability to create visually appealing and brand-aligned interfaces',
+        'Knowledge of improving customer journeys and system usability',
+        'Familiar with chatbot, portal, and form design is a plus',
+    ],
+    salaryBudget: '25000/month'
+}
 ]

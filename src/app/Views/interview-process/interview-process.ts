@@ -23,6 +23,7 @@ export class InterviewProcess implements OnInit, AfterViewChecked {
   messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [];
   userInput = '';
   interviewCompleted = false;
+  isSaving = false;
 
   interviewSections = [
     'Introduction & influences',
@@ -137,6 +138,7 @@ export class InterviewProcess implements OnInit, AfterViewChecked {
       const reply = res.choices[0].message.content;
       this.messages.push({ role: 'assistant', content: reply });
       this.interviewCompleted = true;
+      this.isSaving = true;
       this.saveMessages();
       this.shouldScroll = true;
       this.cdr.detectChanges();
@@ -153,6 +155,9 @@ export class InterviewProcess implements OnInit, AfterViewChecked {
       const ratings = this.extractRatings(evalText);
       sessionStorage.setItem('evaluationRatings', JSON.stringify(ratings));
       sessionStorage.setItem('generalInterview', 'Done');
+
+      this.isSaving = false;
+      this.cdr.detectChanges();
     });
   }
 
@@ -244,7 +249,8 @@ export class InterviewProcess implements OnInit, AfterViewChecked {
   }
 
   proceedNext() {
-    this.endInterview();
+    if (this.isSaving) return;
+
     sessionStorage.setItem('step', '3');
     location.reload();
   }

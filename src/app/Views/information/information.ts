@@ -253,6 +253,28 @@ export class Information implements OnInit {
   }
 
   nextStep() {
+    if (this.displayForm === 6) {
+      const data = this.ApplicationStatusField;
+      if (
+        !data.pendingapplication ||
+        !data.lockincontract ||
+        !data.motorcycle ||
+        !data.license
+      ) {
+        alert("Please answer all required questions before proceeding.");
+        return;
+      }
+    }
+    if (this.displayForm === 7) {
+      const data = this.ApplicationStatusField;
+      if (
+        !data.technicalSkills ||
+        !data.question
+      ) {
+        alert("Please answer all required questions before proceeding.");
+        return;
+      }
+    }
     this.displayForm++;
     sessionStorage.setItem('form', this.displayForm.toString());
   }

@@ -10,7 +10,7 @@ import { getInterviewSystemPrompt, SessionData } from '../../../../gptPrompt/pro
 })
 export class InterviewServices {
 
-  private apiUrl = '';
+  private apiUrl = 'https://api.deepseek.com/chat/completions';
   private apiKey = '';
 
   constructor(private http: HttpClient) {}
