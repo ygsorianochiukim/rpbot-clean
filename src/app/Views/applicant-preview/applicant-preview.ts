@@ -80,16 +80,29 @@ export class ApplicantPreview implements OnInit {
       }
     });
   }
-  sendHiredConfirmation(){
+  sendHiredConfirmation() {
+    const confirmHire = confirm('Are you sure you want to HIRE this applicant?');
+    if (!confirmHire) return;
+
     this.SmsUpdate.number = this.applicant?.contactnumber;
     this.SmsUpdate.position = this.applicant?.desiredPosition;
     this.SmsUpdate.status = "Passed";
-    this.SMSServices.sentConfirmationUpdate(this.SmsUpdate).subscribe(() => {});
+
+    this.SMSServices.sentConfirmationUpdate(this.SmsUpdate).subscribe(() => {
+      alert('Applicant marked as HIRED and notified.');
+    });
   }
-  sendRejectConfirmation(){
+
+  sendRejectConfirmation() {
+    const confirmReject = confirm('Are you sure you want to REJECT this applicant?');
+    if (!confirmReject) return;
+
     this.SmsUpdate.number = this.applicant?.contactnumber;
     this.SmsUpdate.position = this.applicant?.desiredPosition;
     this.SmsUpdate.status = "Failed";
-    this.SMSServices.sentConfirmationUpdate(this.SmsUpdate).subscribe(() => {});
+
+    this.SMSServices.sentConfirmationUpdate(this.SmsUpdate).subscribe(() => {
+      alert('Applicant marked as REJECTED and notified.');
+    });
   }
 }
