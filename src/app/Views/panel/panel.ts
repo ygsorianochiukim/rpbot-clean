@@ -5,18 +5,16 @@ import { CommonModule } from '@angular/common';
 import { Home } from "../home/home";
 import { LucideAngularModule, ChevronLeft } from 'lucide-angular';
 import { InformationServices } from '../../Services/Information/information';
-import { Interview } from "../interview/interview";
-import { InterviewProcess } from "../interview-process/interview-process";
+import { InterviewHandoff } from "../interview-handoff/interview-handoff";
 import { Router } from '@angular/router';
 import { Disclaimer } from '../disclaimer/disclaimer';
 import { ApplicantPreview } from "../applicant-preview/applicant-preview";
 import { Validation } from '../applicantValidation/validation';
-import { VoiceInterviewComponent } from '../interview-voice/interview-voice';
 
 @Component({
   selector: 'app-panel',
   standalone: true,
-  imports: [Information, Test, CommonModule, Home, LucideAngularModule, Interview, InterviewProcess, Disclaimer, Validation , VoiceInterviewComponent],
+  imports: [Information, Test, CommonModule, Home, LucideAngularModule, InterviewHandoff, Disclaimer, Validation],
   templateUrl: './panel.html',
   styleUrl: './panel.scss',
   providers: []
@@ -65,24 +63,16 @@ export class Panel implements OnInit {
     this.reApplyUser = (employmentStatus === 'Re-Apply');
   }
   nextStep() {
-    if (this.step < 5) {
-      if (this.step === 3) {
-        this.Router.navigate(['/evaluation']);
-      }
-      else{
-        this.step++;
-        sessionStorage.setItem('step', this.step.toString());
-      }
+    // Step 4 is the hand-off to the interview desk; there is nothing after it here.
+    if (this.step < 4) {
+      this.step++;
+      sessionStorage.setItem('step', this.step.toString());
     }
     if (this.step === 2) {
       this.showNext = this.form === 7;
     } else {
       this.showNext = true;
     }
-  }
-  voice(){
-    this.step = 6;
-    sessionStorage.setItem('step', this.step.toString());
   }
 
   submitInfo() {
