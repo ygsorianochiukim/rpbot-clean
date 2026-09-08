@@ -11,13 +11,7 @@
             <app-test></app-test>
         </div>
         <div *ngIf="step === 4" class="transition-all duration-500 ease-in-out opacity-100" [ngClass]="{ 'opacity-0 translate-x-10': step !== 4 }">
-            <app-interview></app-interview>
-        </div>
-        <div *ngIf="step === 5" class="transition-all duration-500 ease-in-out opacity-100" [ngClass]="{ 'opacity-0 translate-x-10': step !== 5 }">
-            <app-interview-process></app-interview-process>
-        </div>
-        <div *ngIf="step === 6" class="transition-all duration-500 ease-in-out opacity-100" [ngClass]="{ 'opacity-0 translate-x-10': step !== 6 }">
-            <app-voice-interview></app-voice-interview>
+            <app-interview-handoff></app-interview-handoff>
         </div>
     </div>
     <div class="flex justify-between mt-6">
@@ -28,7 +22,7 @@
                 </button>
             }
             @else {
-                <button *ngIf="step !==1 && step !==2 && step !==5" (click)="prevStep()" class="bg-accent text-white px-4 py-3 text-xl font-Playfair rounded-full">
+                <button *ngIf="step !==1 && step !==2" (click)="prevStep()" class="bg-accent text-white px-4 py-3 text-xl font-Playfair rounded-full">
                     <lucide-icon [img]="back"></lucide-icon>
                 </button>
             }
@@ -40,14 +34,8 @@
                     Next
                 </button>
             </div>
-            <button *ngIf="step !== 2 && step !== 3 && step !== 5" (click)="nextStep()" class="w-full bg-accent text-white px-6 py-3 text-xl font-Playfair rounded-full">
+            <button *ngIf="step !== 2 && step !== 3 && step !== 4" (click)="nextStep()" class="w-full bg-accent text-white px-6 py-3 text-xl font-Playfair rounded-full">
                 Proceed
-            </button>
-            <button *ngIf="step === 4" (click)="voice()" class="w-full bg-accent text-white px-6 py-3 text-xl font-Playfair rounded-full">
-                Voice
-            </button>
-            <button *ngIf="step === 3" (click)="nextStep()" class="bg-accent !w-full text-white px-6 py-3 text-xl font-Playfair rounded-full cursor-pointer disabled:cursor-not-allowed" [disabled]="generalInterview != 'Done'">
-                Complete
             </button>
         </div>
         

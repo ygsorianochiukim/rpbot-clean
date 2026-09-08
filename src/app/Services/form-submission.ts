@@ -145,4 +145,13 @@ export class FormSubmission {
   updateMarriage(id: number, data: Marriage): Observable<Marriage> {
     return this.http.put(`${this.apiUrl}applicantMarriage/update/${id}`, data);
   }
+
+  /** The interview runs on the Approvals desk. The API hands the applicant
+   *  over and answers with their one-time link. */
+  openInterview(applicantId: number): Observable<{ url: string; reused?: boolean }> {
+    return this.http.post<{ url: string; reused?: boolean }>(`${this.apiUrl}interview/open`, { applicant_i_information_id: applicantId });
+  }
+  interviewStatus(applicantId: number): Observable<{ verdict: string; verdict_at: string | null; interview_url: string | null }> {
+    return this.http.get<{ verdict: string; verdict_at: string | null; interview_url: string | null }>(`${this.apiUrl}interview/status/${applicantId}`);
+  }
 }

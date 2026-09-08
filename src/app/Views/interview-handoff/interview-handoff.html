@@ -1,0 +1,20 @@
+<div class="p-6">
+    <header class="text-4xl text-left text-black font-semibold font-Playfair leading-10">
+        Tips to Ace Your Interview
+    </header>
+    <div class="text-black text-justify mt-5 text-xl font-Lora flex flex-col gap-3 max-w-3xl mx-auto">
+        <p><b>1.</b> Focus on your actual experience — share what you did, how you did it, and what you learned. Be specific about your tasks and results.</p>
+        <p><b>2.</b> If you don’t have experience yet, be honest. Highlight your willingness to learn, your discipline, and any related training.</p>
+        <p><b>3.</b> Read each question carefully before answering. Keep your answers short but clear.</p>
+        <p><b>4.</b> The interview takes about twenty to thirty minutes. You will choose the language you are most comfortable in at the start.</p>
+    </div>
+
+    <p class="mt-10 font-[700] text-2xl font-Playfair">Ready, {{ applicantName }}? Your interview opens on our interview desk.</p>
+    <p class="mt-2 text-lg font-Lora text-black">You will be sent there now. When it ends, we will text you the result on the number you gave us.</p>
+
+    <button (click)="startInterview()" [disabled]="busy"
+        class="w-full mt-6 bg-accent text-white px-6 py-3 text-xl font-Playfair rounded-full cursor-pointer disabled:cursor-not-allowed disabled:!bg-gray-400">
+        {{ busy ? 'Opening your interview…' : 'Start my interview' }}
+    </button>
+    <p *ngIf="error" class="mt-4 text-red-700 font-Lora">{{ error }}</p>
+</div>
